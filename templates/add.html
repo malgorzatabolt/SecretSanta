@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Secret Santa{% endblock %}
+
+{% block script %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+    let counter = 2;
+    $("a#add").click(function() {
+        counter++;
+        $("#submit").remove();
+        $("form").append(
+        '<div class="person-container">' +
+        '<div class="row p-2">' +
+        '<div class="col-2"><h4><span class="badge bg-primary mt-2">'+counter+'</span></h4></div>' +
+        '<div class="col-5">' +
+        '<input type="text" name="name" class="form-control w-50 p-2 ms-5" placeholder="Name"/>' +
+        '</div>' +
+        '<div class="col-5">' +
+        '<input type="text" name="email" class="form-control w-50 p-2 ms-5" placeholder="Email"/>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '<button type="submit" class="btn btn-primary btn-lg px-4 gap-3 mt-3" id="submit">Add</button>');
+        });
+    $("a#remove").click(function() {
+        counter--;
+        $("#submit").remove();
+        $("form .person-container:last-child").remove();
+        $("form").append(
+        '<button type="submit" class="btn btn-primary btn-lg px-4 gap-3 mt-3" id="submit">Add</button>');
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="p-5 text-center bg-body-tertiary rounded-3">
+    <img src="../static/Santa.png" class="bi mt-4 mb-3" alt="Bootstrap Themes" height="100" loading="lazy">
+        <h1 class="text-body-emphasis">Add you friends!</h1>
+    <p class="col-lg-8 mx-auto fs-5 text-muted">
+      Let's do this! Add some people to the Secret Santa team!
+    </p>
+    <div class="d-inline-flex gap-2 mb-5">
+      <a type="button" class="btn btn-primary btn-lg px-4 gap-3" id="add">Add new person</a>
+      <a type="button" class="btn btn-secondary btn-lg px-4 gap-3" id="remove">Remove a person</a>
+    </div>
+      <div>
+          <form action="{{ url_for('add_users') }}" method="POST">
+              <div class="row p-2">
+                  <div class="col-2"><h4><span class="badge bg-primary mt-2">1</span></h4></div>
+                  <div class="col-5">
+                      <input type="text" name="name" class="form-control w-50 p-2 ms-5" placeholder="Name"/>
+                  </div>
+                  <div class="col-5">
+                      <input type="text" name="email" class="form-control w-50 p-2 ms-5" placeholder="Email"/>
+                  </div>
+              </div>
+              <div class="row p-2">
+                  <div class="col-2"><h4><span class="badge bg-primary mt-2">2</span></h4></div>
+                  <div class="col-5">
+                      <input type="text" name="name" class="form-control w-50 p-2 ms-5" placeholder="Name"/>
+                  </div>
+                  <div class="col-5">
+                      <input type="text" name="email" class="form-control w-50 p-2 ms-5" placeholder="Email"/>
+                  </div>
+              </div>
+                <button type="submit" class="btn btn-primary btn-lg px-4 gap-3 mt-3" id="submit">Add</button>
+          </form>
+
+      </div>
+  </div>
+</div>
+{% endblock %}
