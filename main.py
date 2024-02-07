@@ -6,6 +6,8 @@ from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField, IntegerField, FieldList, FormField
 from wtforms.validators import DataRequired, Email
+from send import Postman
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
@@ -82,7 +84,23 @@ def review():
     global info_dict
     result = db.session.execute(db.select(Person).order_by(Person.id))
     all_participants = result.scalars()
+    if request.method == "POST":
+        for person in all_participants:
+            post = Postman(
+                email=person.email,
+                msg=f"Ho! Ho! Ho! Hello {person.name}!\n"
+                    f"A person you for whom you will get a present is XXX! "
+                    f"The party will take place in {info_dict['place']} on {info_dict['date']}."
+                    f"Maximal price of the presents was set to {info_dict['price']}"
+            )
+            post.send_msg()
+        return redirect(url_for('thank'))
     return render_template("review.html", info=info_dict, participants=all_participants)
+
+
+@app.route('/thank', methods=['GET', 'POST'])
+def thank():
+    return render_template('thank.html')
 
 
 if __name__ == '__main__':
