@@ -11,13 +11,17 @@
 </div>
 <div class="container col-xl-10 col-xxl-8 px-4 py-5">
     <div class="row align-items-center g-lg-5 py-2">
-      <div class="col-lg-5 text-lg-start">
+      <div class="col-lg-5 text-lg-start position-relative">
           <h6 class="display-6 fw-bold lh-4 text-body-emphasis mb-3 text-center">Party details</h6>
-            <ul class="list-group list-group-horizontal mx-auto p-2" style="width: 100%">
-                <li class="list-group-item list-group-item-primary text-center">{{ info['date'] }}</li>
-                <li class="list-group-item list-group-item-primary text-center">{{ info['place'] }}</li>
-                <li class="list-group-item list-group-item-primary text-center">{{ info['price'] }}</li>
-            </ul>
+            <ul class="list-group list-group-horizontal mx-auto px-3 py-2" style="width: 100%">
+                <li class="list-group-item list-group-item-primary text-center party-details">Date</li>
+                <li class="list-group-item list-group-item-primary text-center party-details">{{ info['date'] }}</li></ul>
+            <ul class="list-group list-group-horizontal mx-auto px-3 py-2" style="width: 100%">
+                <li class="list-group-item list-group-item-primary text-center party-details">Place</li>
+                <li class="list-group-item list-group-item-primary text-center party-details">{{ info['place'] }}</li></ul>
+            <ul class="list-group list-group-horizontal mx-auto px-3 py-2" style="width: 100%">
+                <li class="list-group-item list-group-item-primary text-center party-details">Max price</li>
+                <li class="list-group-item list-group-item-primary text-center party-details">{{ info['price'] }}</li></ul>
         <h6 class="display-6 fw-bold lh-1 text-body-emphasis mb-3 text-center">List of guests</h6>
             <ul class="list-group mx-auto p-2" style="width: 50%;">
                 {% for participant in participants: %}
@@ -26,7 +30,7 @@
             </ul>
       </div>
       <div class="col-md-10 mx-auto col-lg-7">
-          <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary">
+          <form  action="{{ url_for('review') }}" method="POST" class="p-4 p-md-5 border rounded-3 bg-body-tertiary">
               <label for="exampleFormControlTextarea1" class="form-label">Message to your friends</label>
           <div class="card" style="width: 100%">
               <div class="card-body">
