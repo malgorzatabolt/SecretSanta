@@ -7,6 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField, IntegerField, FieldList, FormField
 from wtforms.validators import DataRequired, Email
 from send import Postman
+from draw import Mixer
 
 
 app = Flask(__name__)
@@ -18,6 +19,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///people.db"
 db = SQLAlchemy()
 db.init_app(app)
 info_dict = {}
+mixed = []
 
 
 class Person(db.Model):
@@ -75,6 +77,11 @@ def add_users():
             db.session.add(new_person)
             db.session.commit()
             i += 1
+        result = db.session.execute(db.select(Person).order_by(Person.id))
+        participants_to_pick = result.all()
+        mixer = Mixer(participants_to_pick)
+        global mixed
+        mixed = mixer.mix_and_pick()
         return redirect(url_for('review'))
     return render_template("add.html", form=form)
 
@@ -85,15 +92,19 @@ def review():
     result = db.session.execute(db.select(Person).order_by(Person.id))
     all_participants = result.scalars()
     if request.method == "POST":
+        i = 0
         for person in all_participants:
+            picked_id = mixed[i]
             post = Postman(
                 email=person.email,
                 msg=f"Ho! Ho! Ho! Hello {person.name}!\n"
-                    f"A person you for whom you will get a present is XXX! "
+                    f"A person you for whom you will get a present is {db.get_or_404(Person, picked_id).name}! "
                     f"The party will take place in {info_dict['place']} on {info_dict['date']}."
-                    f"Maximal price of the presents was set to {info_dict['price']}"
+                    f"Maximal price of the presents was set to {info_dict['price']} \n"
+                    f"{request.form['message']}"
             )
             post.send_msg()
+            i += 1
         return redirect(url_for('thank'))
     return render_template("review.html", info=info_dict, participants=all_participants)
 

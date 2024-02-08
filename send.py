@@ -1,6 +1,6 @@
 import smtplib
-my_email = "malgorzatabolt00@gmail.com"
-password = "aogxyvpqxrkrkcwt"
+MY_EMAIL = "malgorzatabolt00@gmail.com"
+PASSWORD = "aogxyvpqxrkrkcwt"
 
 
 class Postman:
@@ -11,8 +11,8 @@ class Postman:
     def send_msg(self):
         with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
             connection.starttls()
-            connection.login(user=my_email, password=password)
+            connection.login(user=MY_EMAIL, password=PASSWORD)
             connection.sendmail(
-                from_addr=my_email,
+                from_addr=MY_EMAIL,
                 to_addrs=self.email,
                 msg=self.msg)
