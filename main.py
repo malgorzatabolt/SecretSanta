@@ -4,8 +4,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DateField, IntegerField, FieldList, FormField
-from wtforms.validators import DataRequired, Email
+from wtforms import StringField, SubmitField, DateField, IntegerField
+from wtforms.validators import DataRequired
 from send import Postman
 from draw import Mixer
 
@@ -26,6 +26,7 @@ class Person(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(250), nullable=False)
     email: Mapped[str] = mapped_column(String(250), nullable=False)
+    groupid: Mapped[int] = mapped_column(Integer, nullable=False)
 
 
 with app.app_context():
@@ -40,8 +41,8 @@ class MainForm(FlaskForm):
 
 
 class SantaForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    email = StringField('E-mail address', validators=[DataRequired(), Email()])
+    name = StringField('Name')
+    email = StringField('E-mail address')
     submit = SubmitField(label='Submit')
 
 
@@ -60,7 +61,6 @@ def info():
             "place": request.form['place'],
             "price": request.form['max_price']
         }
-        print(info_dict)
         return redirect(url_for('add_users'))
     return render_template("info.html", form=form)
 
@@ -71,42 +71,48 @@ def add_users():
     if request.method == "POST":
         names = request.form.getlist('name')
         emails = request.form.getlist('email')
+        new_group_id = 1
+        if Person.query.first() is not None:
+            last_group_id = Person.query.order_by(Person.id.desc()).first().groupid
+            new_group_id = last_group_id+1
         for i in range(len(emails)):
             new_person = Person(name=names[i],
-                                email=emails[i])
+                                email=emails[i],
+                                groupid=new_group_id)
             db.session.add(new_person)
             db.session.commit()
             i += 1
-        result = db.session.execute(db.select(Person).order_by(Person.id))
-        participants_to_pick = result.all()
+        result = db.session.execute(db.select(Person).where(Person.groupid == new_group_id).order_by(Person.id))
+        participants_to_pick = result.scalars().all()
         mixer = Mixer(participants_to_pick)
         global mixed
         mixed = mixer.mix_and_pick()
-        return redirect(url_for('review'))
+        return redirect(url_for('review', group_id=new_group_id))
     return render_template("add.html", form=form)
 
 
 @app.route('/review', methods=['GET', 'POST'])
 def review():
     global info_dict
-    result = db.session.execute(db.select(Person).order_by(Person.id))
-    all_participants = result.scalars()
+    group_id = request.args.get('group_id')
+    result = db.session.execute(db.select(Person).where(Person.groupid == group_id).order_by(Person.id))
+    all_participants = result.scalars().all()
     if request.method == "POST":
         i = 0
-        for person in all_participants:
-            picked_id = mixed[i]
+        for participant in all_participants:
             post = Postman(
-                email=person.email,
-                msg=f"Ho! Ho! Ho! Hello {person.name}!\n"
-                    f"A person you for whom you will get a present is {db.get_or_404(Person, picked_id).name}! "
-                    f"The party will take place in {info_dict['place']} on {info_dict['date']}."
+                email=participant.email,
+                msg=f"Subject: Secret Santa Party!\n\n"
+                    f"Ho! Ho! Ho! Hello {participant.name}!\n"
+                    f"Get a present ready for {mixed[i].name}! "
+                    f"The Secret Santa Party will take place in {info_dict['place']} on {info_dict['date']}."
                     f"Maximal price of the presents was set to {info_dict['price']} \n"
                     f"{request.form['message']}"
             )
             post.send_msg()
             i += 1
         return redirect(url_for('thank'))
-    return render_template("review.html", info=info_dict, participants=all_participants)
+    return render_template("review.html", info=info_dict, participants=all_participants, group_id=group_id)
 
 
 @app.route('/thank', methods=['GET', 'POST'])

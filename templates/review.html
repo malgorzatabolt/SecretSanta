@@ -30,7 +30,7 @@
             </ul>
       </div>
       <div class="col-md-10 mx-auto col-lg-7">
-          <form  action="{{ url_for('review') }}" method="POST" class="p-4 p-md-5 border rounded-3 bg-body-tertiary">
+          <form  action="{{ url_for('review', group_id=group_id) }}" method="POST" class="p-4 p-md-5 border rounded-3 bg-body-tertiary">
               <label for="exampleFormControlTextarea1" class="form-label">Message to your friends</label>
           <div class="card" style="width: 100%">
               <div class="card-body">

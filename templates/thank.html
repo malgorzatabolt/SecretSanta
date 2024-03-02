@@ -1,5 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}Secret Santa{% endblock %}
 {% block content %}
-<h1>Thank you!</h1>
+<div class="container my-5">
+  <div class="p-5 text-center bg-body-tertiary rounded-3">
+    <img src="../static/Santa.png" class="bi mt-4 mb-3" alt="Bootstrap Themes" height="100" loading="lazy">
+    <h1 class="text-body-emphasis">All done!</h1>
+    <p class="col-lg-8 mx-auto fs-5 text-muted">
+        Email to the participants have been successfully sent.
+        Thank you for using Secret Santa App! If you wish create another Secret Santa Party click the button below.<br>
+        Otherwise, see you at the party!
+    </p>
+    <div class="d-inline-flex gap-2 mb-5">
+        <a href="{{ url_for('home') }}">
+      <button class="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill" type="button">
+        Create new group
+      </button></a>
+    </div>
+  </div>
+</div>
 {% endblock %}
